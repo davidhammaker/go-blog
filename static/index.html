@@ -37,7 +37,7 @@
       <div id="page-body"></div>
     </div>
     <script>
-      const converter = new showdown.Converter();
+      const converter = new showdown.Converter({tables: true});
       const md = {{ .Content }};
       let pageBody = document.getElementById("page-body");
       pageBody.innerHTML = converter.makeHtml(md);

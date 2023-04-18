@@ -22,15 +22,17 @@ docker build -t go-blog-container .
 
 Set the following environment variables:
 
-| Variable            | Description                                                                                |
-| ------------------- | ------------------------------------------------------------------------------------------ |
-| MYSQL_ROOT_PASSWORD | The root password you're using for your MySQL database.                                    |
-| DBUSER              | If not `"root"`, you may need to configure some permissions.                               |
-| DBPASS              | The password for `DBUSER`; if the user is `"root"`, this will match `MYSQL_ROOT_PASSWORD`. |
-| DBHOST              | For development, this will be the name of your MySQL container. E.g. `"go-blog-mysql"`.    |
-| DBPORT              | Most likely 3306, unless you choose to change it.                                          |
-| DBNAME              | Any database name you choose. E.g. `"mydbname"`.                                           |
-| HOMEREF             | The URL reference to a markdown file representing the blog's home page.                    |
+| Variable              | Description                                                                                                                                               |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `MYSQL_ROOT_PASSWORD` | The root password you're using for your MySQL database.                                                                                                   |
+| `DBUSER`              | If not `"root"`, you may need to configure some permissions.                                                                                              |
+| `DBPASS`              | The password for `DBUSER`; if the user is `"root"`, this will match `MYSQL_ROOT_PASSWORD`.                                                                |
+| `DBHOST`              | For development, this will be the name of your MySQL container. E.g. `"go-blog-mysql"`.                                                                   |
+| `DBPORT`              | Most likely 3306, unless you choose to change it.                                                                                                         |
+| `DBNAME`              | Any database name you choose. E.g. `"mydbname"`.                                                                                                          |
+| `HOMEREF`             | The URL reference to a markdown file representing the blog's home page. E.g. `"https://raw.githubusercontent.com/davidhammaker/go-blog/master/README.md"` |
+
+<br />
 
 Then run:
 
