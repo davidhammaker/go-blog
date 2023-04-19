@@ -12,10 +12,15 @@ import (
 	"github.com/go-sql-driver/mysql"
 )
 
+// DBHandler is a struct whose 'db' attribute is a database Handler.
+// The handler can be set with the ConnectDB function.
 type DBHandler struct {
 	db *sql.DB
 }
 
+// ConnectDB connects to a MySQL database, given the following
+// environment variables are set: DBHOST, DBPORT, DBUSER, DBPASS,
+// DBNAME
 func (d *DBHandler) ConnectDB() error {
 	addr := os.Getenv("DBHOST") + ":" + os.Getenv("DBPORT")
 	cfg := mysql.Config{
@@ -37,24 +42,33 @@ func (d *DBHandler) ConnectDB() error {
 	return nil
 }
 
+// Entry stores information from a row in the 'entries' table in the
+// database.
 type Entry struct {
 	id  int
 	ref string
 }
 
+// CssHandler is an http Handler that serves a static CSS file for the
+// blog.
 type CssHandler struct{}
 
+// ServeHTTP writes the static CSS file for the CssHandler.
 func (CssHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles("static/index.css"))
 	w.Header().Set("content-type", "text/css; charset=utf-8")
 	tmpl.Execute(w, nil)
 }
 
+// blogData stores data to be rendered in the html template for blog
+// pages.
 type blogData struct {
 	BlogTitle string
 	Content   string
 }
 
+// GetBlogTitle returns the value of the BLOGTITLE environment
+// variable, or returns the value "My GO Blog".
 func GetBlogTitle() string {
 	title, exists := os.LookupEnv("BLOGTITLE")
 	if !exists {
@@ -63,8 +77,12 @@ func GetBlogTitle() string {
 	return title
 }
 
+// BlogHandler is an http Handler that serves the main html page for
+// the blog.
 type BlogHandler struct{}
 
+// ServeHTTP fills the html template with data, including the home page
+// and any blog posts as derived from database entries.
 func (BlogHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	id := r.URL.Path[1:]
@@ -72,8 +90,13 @@ func (BlogHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var ref string
 
 	if id == "" {
+		// If no id is provided, assume this is the home page and use that
+		// ref.
 		ref = os.Getenv("HOMEREF")
+
 	} else {
+		// If an id is provided, attempt to look up the markdown file's URL
+		// ref.
 
 		d := DBHandler{}
 		connectErr := d.ConnectDB()
@@ -93,6 +116,9 @@ func (BlogHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "text/html; charset=UTF-8")
 
 	res, resErr := http.Get(ref)
+
+	// If an error occurs, it means the id was invalid, making this
+	// request a 404.
 	if resErr != nil {
 		fmt.Println(resErr)
 		w.WriteHeader(http.StatusNotFound)
@@ -109,6 +135,7 @@ func (BlogHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	tmpl.Execute(w, blogData{BlogTitle: GetBlogTitle(), Content: string(content[:])})
 }
 
+// main maps paths to handlers and starts the server.
 func main() {
 	http.Handle("/static/index.css", CssHandler{})
 	http.Handle("/", BlogHandler{})
