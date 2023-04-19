@@ -31,6 +31,7 @@ Set the following environment variables:
 | `DBPORT`              | Most likely 3306, unless you choose to change it.                                                                                                         |
 | `DBNAME`              | Any database name you choose. E.g. `"mydbname"`.                                                                                                          |
 | `HOMEREF`             | The URL reference to a markdown file representing the blog's home page. E.g. `"https://raw.githubusercontent.com/davidhammaker/go-blog/master/README.md"` |
+| `BLOGTITLE`           | The title of your blog, as it will appear on the top of each page.                                                                                        |
 
 <br />
 
@@ -44,6 +45,7 @@ docker run -d --name go-blog-app --network go-blog-network -p 8080:8080 \
   -e DBPORT=$DBPORT \
   -e DBNAME=$DBNAME \
   -e HOMEREF=$HOMEREF \
+   -e BLOGTITLE="$BLOGTITLE" \
   go-blog-container
 ```
 

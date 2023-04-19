@@ -21,6 +21,18 @@ code {
   border-radius: 4px;
   color: #cccccc !important;
 }
+a {
+  text-decoration: none !important;
+  color: #c5e5f0 !important;
+}
 #content {
   background-color: #003040;
+}
+#title {
+  font-size: larger;
+}
+#top {
+  width: 100%;
+  justify-content: space-between;
+  display: inline-flex;
 }

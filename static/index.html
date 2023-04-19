@@ -33,7 +33,17 @@
   </head>
   <body>
     <div id="content" class="container-lg p-4">
-      <div id="top"></div>
+      <div id="top">
+        <div>
+          <h3>
+            <a id="title" href="/">{{ .BlogTitle }}</a>
+          </h3>
+        </div>
+        <div>
+          <a class="px-2" id="posts">All Posts</a>
+        </div>
+      </div>
+      <hr />
       <div id="page-body"></div>
     </div>
     <script>

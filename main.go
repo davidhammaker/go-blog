@@ -51,7 +51,16 @@ func (CssHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 type blogData struct {
-	Content string
+	BlogTitle string
+	Content   string
+}
+
+func GetBlogTitle() string {
+	title, exists := os.LookupEnv("BLOGTITLE")
+	if !exists {
+		return "My GO Blog"
+	}
+	return title
 }
 
 type BlogHandler struct{}
@@ -71,8 +80,7 @@ func (BlogHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if connectErr != nil {
 			fmt.Println(connectErr)
 		}
-		db := d.db
-		row := db.QueryRow("SELECT id, ref FROM entries WHERE id = ?", id)
+		row := d.db.QueryRow("SELECT id, ref FROM entries WHERE id = ?", id)
 		var ent Entry
 		err := row.Scan(&ent.id, &ent.ref)
 		if err != nil {
@@ -88,7 +96,7 @@ func (BlogHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if resErr != nil {
 		fmt.Println(resErr)
 		w.WriteHeader(http.StatusNotFound)
-		tmpl.Execute(w, blogData{Content: "# 404\n\nWhatever you are looking for, it's not here."})
+		tmpl.Execute(w, blogData{BlogTitle: GetBlogTitle(), Content: "# 404\n\nWhatever you are looking for, it's not here."})
 		return
 	}
 
@@ -98,7 +106,7 @@ func (BlogHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(readErr)
 	}
 
-	tmpl.Execute(w, blogData{Content: string(content[:])})
+	tmpl.Execute(w, blogData{BlogTitle: GetBlogTitle(), Content: string(content[:])})
 }
 
 func main() {
