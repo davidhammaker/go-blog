@@ -77,12 +77,60 @@ func GetBlogTitle() string {
 	return title
 }
 
+// entryData stores data to be rendered for each entry in the list of
+// all entries.
+type entryData struct {
+	Id      int
+	Title   string
+	Created string
+}
+
+// allEntriesData stores all data to be rendered in the list of
+// entries.
+type allEntriesData struct {
+	BlogTitle string
+	Entries   []entryData
+}
+
+// EntriesHandler is an http Handler that serves an html page containing
+// links to all blog entries.
+type EntriesHandler struct{}
+
+// EntriesHandler is an http Handler that serves a list of all blog
+// entries with links to their respective pages.
+func (EntriesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	d := DBHandler{}
+	connectErr := d.ConnectDB()
+	if connectErr != nil {
+		fmt.Println(connectErr)
+	}
+	rows, queryErr := d.db.Query("SELECT id, title, created FROM entries ORDER BY created DESC;")
+	if queryErr != nil {
+		fmt.Println(queryErr)
+	}
+	defer rows.Close()
+	var entries []entryData
+	for rows.Next() {
+		var ent entryData
+		err := rows.Scan(&ent.Id, &ent.Title, &ent.Created)
+		if err != nil {
+			fmt.Println(err)
+		}
+		entries = append(entries, ent)
+	}
+
+	tmpl := template.Must(template.ParseFiles("static/all_posts.html"))
+	w.Header().Set("content-type", "text/html; charset=UTF-8")
+
+	tmpl.Execute(w, allEntriesData{BlogTitle: GetBlogTitle(), Entries: entries})
+}
+
 // BlogHandler is an http Handler that serves the main html page for
 // the blog.
 type BlogHandler struct{}
 
 // ServeHTTP fills the html template with data, including the home page
-// and any blog posts as derived from database entries.
+// and any blog entries as derived from database entries.
 func (BlogHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	id := r.URL.Path[1:]
@@ -138,6 +186,7 @@ func (BlogHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // main maps paths to handlers and starts the server.
 func main() {
 	http.Handle("/static/index.css", CssHandler{})
+	http.Handle("/all-posts", EntriesHandler{})
 	http.Handle("/", BlogHandler{})
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

@@ -36,3 +36,12 @@ a {
   justify-content: space-between;
   display: inline-flex;
 }
+.post {
+  width: 100%;
+}
+.post-title {
+  font-size: larger;
+}
+.post-date {
+  color: #cccccc;
+}

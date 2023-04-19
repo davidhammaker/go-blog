@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>{{ .BlogTitle }}</title>
+    <title>All Posts | {{ .BlogTitle }}</title>
     <link rel="stylesheet" type="text/css" href="/static/index.css" />
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
@@ -16,20 +16,6 @@
       integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
       crossorigin="anonymous"
     ></script>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"
-      integrity="sha512-LhccdVNGe2QMEfI3x4DVV3ckMRe36TfydKss6mJpdHjNFiV07dFpS2xzeZedptKZrwxfICJpez09iNioiSZ3hA=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    ></script>
-    <link
-      rel="stylesheet"
-      href="https://highlightjs.org/static/demo/styles/base16/circus.css"
-    />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
-    <script>
-      hljs.highlightAll();
-    </script>
   </head>
   <body>
     <div id="content" class="container-lg p-4">
@@ -40,17 +26,19 @@
           </h3>
         </div>
         <div>
-          <a class="px-2" id="posts" href="all-posts">All Posts</a>
+          <a class="px-2" href="/">Home</a>
         </div>
       </div>
       <hr />
-      <div id="page-body"></div>
+      <div id="posts">
+        {{ range .Entries }}
+        <div class="post">
+          <a class="post-title" href="/{{ .Id }}">{{ .Title }}</a
+          ><span style="padding: 0px 15px">-</span
+          ><em class="post-date">{{ .Created }}</em>
+        </div>
+        {{ end }}
+      </div>
     </div>
-    <script>
-      const converter = new showdown.Converter({tables: true});
-      const md = {{ .Content }};
-      let pageBody = document.getElementById("page-body");
-      pageBody.innerHTML = converter.makeHtml(md);
-    </script>
   </body>
 </html>
