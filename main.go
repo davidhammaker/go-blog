@@ -24,11 +24,12 @@ type DBHandler struct {
 func (d *DBHandler) ConnectDB() error {
 	addr := os.Getenv("DBHOST") + ":" + os.Getenv("DBPORT")
 	cfg := mysql.Config{
-		User:   os.Getenv("DBUSER"),
-		Passwd: os.Getenv("DBPASS"),
-		Net:    "tcp",
-		Addr:   addr,
-		DBName: os.Getenv("DBNAME"),
+		User:                 os.Getenv("DBUSER"),
+		Passwd:               os.Getenv("DBPASS"),
+		Net:                  "tcp",
+		Addr:                 addr,
+		DBName:               os.Getenv("DBNAME"),
+		AllowNativePasswords: true,
 	}
 	db, err := sql.Open("mysql", cfg.FormatDSN())
 	if err != nil {
@@ -102,11 +103,11 @@ func (EntriesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	d := DBHandler{}
 	connectErr := d.ConnectDB()
 	if connectErr != nil {
-		fmt.Println(connectErr)
+		fmt.Println("Could not connect:", connectErr)
 	}
 	rows, queryErr := d.db.Query("SELECT id, title, created FROM entries ORDER BY created DESC;")
 	if queryErr != nil {
-		fmt.Println(queryErr)
+		fmt.Println("SELECT failed:", queryErr)
 	}
 	defer rows.Close()
 	var entries []entryData
@@ -114,7 +115,7 @@ func (EntriesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		var ent entryData
 		err := rows.Scan(&ent.Id, &ent.Title, &ent.Created)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println("Scan failed:", err)
 		}
 		entries = append(entries, ent)
 	}
@@ -149,13 +150,13 @@ func (BlogHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		d := DBHandler{}
 		connectErr := d.ConnectDB()
 		if connectErr != nil {
-			fmt.Println(connectErr)
+			fmt.Println("Could not connect:", connectErr)
 		}
 		row := d.db.QueryRow("SELECT id, ref FROM entries WHERE id = ?", id)
 		var ent Entry
 		err := row.Scan(&ent.id, &ent.ref)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println("Scan failed:", err)
 		}
 		ref = ent.ref
 	}
@@ -168,7 +169,7 @@ func (BlogHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// If an error occurs, it means the id was invalid, making this
 	// request a 404.
 	if resErr != nil {
-		fmt.Println(resErr)
+		fmt.Println("Response error:", resErr)
 		w.WriteHeader(http.StatusNotFound)
 		tmpl.Execute(w, blogData{BlogTitle: GetBlogTitle(), Content: "# 404\n\nWhatever you are looking for, it's not here."})
 		return
@@ -177,7 +178,7 @@ func (BlogHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer res.Body.Close()
 	content, readErr := io.ReadAll(res.Body)
 	if readErr != nil {
-		fmt.Println(readErr)
+		fmt.Println("Read error:", readErr)
 	}
 
 	tmpl.Execute(w, blogData{BlogTitle: GetBlogTitle(), Content: string(content[:])})
