@@ -66,6 +66,7 @@ func (CssHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 type blogData struct {
 	BlogTitle string
 	Content   string
+	Footer    string
 }
 
 // GetBlogTitle returns the value of the BLOGTITLE environment
@@ -171,7 +172,7 @@ func (BlogHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if resErr != nil {
 		fmt.Println("Response error:", resErr)
 		w.WriteHeader(http.StatusNotFound)
-		tmpl.Execute(w, blogData{BlogTitle: GetBlogTitle(), Content: "# 404\n\nWhatever you are looking for, it's not here."})
+		tmpl.Execute(w, blogData{BlogTitle: GetBlogTitle(), Content: "# 404\n\nWhatever you are looking for, it's not here.", Footer: ""})
 		return
 	}
 
@@ -181,7 +182,7 @@ func (BlogHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Read error:", readErr)
 	}
 
-	tmpl.Execute(w, blogData{BlogTitle: GetBlogTitle(), Content: string(content[:])})
+	tmpl.Execute(w, blogData{BlogTitle: GetBlogTitle(), Content: string(content[:]), Footer: os.Getenv("FOOTER")})
 }
 
 // main maps paths to handlers and starts the server.

@@ -32,6 +32,7 @@ Set the following environment variables:
 | `DBNAME`              | Any database name you choose. E.g. `"mydbname"`.                                                                                                          |
 | `HOMEREF`             | The URL reference to a markdown file representing the blog's home page. E.g. `"https://raw.githubusercontent.com/davidhammaker/go-blog/master/README.md"` |
 | `BLOGTITLE`           | The title of your blog, as it will appear on the top of each page.                                                                                        |
+| `FOOTER`              | Footer text displayed at the bottom of the home page and all blog posts, such as copyright information.                                                   |
 
 <br />
 
@@ -45,7 +46,8 @@ docker run -d --name go-blog-app --network go-blog-network -p 8080:8080 \
   -e DBPORT=$DBPORT \
   -e DBNAME=$DBNAME \
   -e HOMEREF=$HOMEREF \
-   -e BLOGTITLE="$BLOGTITLE" \
+  -e BLOGTITLE="$BLOGTITLE" \
+  -e FOOTER="$FOOTER" \
   go-blog-container
 ```
 
