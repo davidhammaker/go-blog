@@ -46,8 +46,9 @@ func (d *DBHandler) ConnectDB() error {
 // Entry stores information from a row in the 'entries' table in the
 // database.
 type Entry struct {
-	id  int
-	ref string
+	id          int
+	ref         string
+	description string
 }
 
 // CssHandler is an http Handler that serves a static CSS file for the
@@ -64,9 +65,10 @@ func (CssHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // blogData stores data to be rendered in the html template for blog
 // pages.
 type blogData struct {
-	BlogTitle string
-	Content   string
-	Footer    string
+	BlogTitle   string
+	Content     string
+	Description string
+	Footer      string
 }
 
 // GetBlogTitle returns the value of the BLOGTITLE environment
@@ -138,11 +140,13 @@ func (BlogHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Path[1:]
 
 	var ref string
+	var description string
 
 	if id == "" {
 		// If no id is provided, assume this is the home page and use that
 		// ref.
 		ref = os.Getenv("HOMEREF")
+		description = os.Getenv("HOMEDESCRIPTION")
 
 	} else {
 		// If an id is provided, attempt to look up the markdown file's URL
@@ -153,13 +157,14 @@ func (BlogHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if connectErr != nil {
 			fmt.Println("Could not connect:", connectErr)
 		}
-		row := d.db.QueryRow("SELECT id, ref FROM entries WHERE id = ?", id)
+		row := d.db.QueryRow("SELECT id, ref, description FROM entries WHERE id = ?", id)
 		var ent Entry
-		err := row.Scan(&ent.id, &ent.ref)
+		err := row.Scan(&ent.id, &ent.ref, &ent.description)
 		if err != nil {
 			fmt.Println("Scan failed:", err)
 		}
 		ref = ent.ref
+		description = ent.description
 	}
 
 	tmpl := template.Must(template.ParseFiles("static/index.html"))
@@ -172,7 +177,7 @@ func (BlogHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if resErr != nil {
 		fmt.Println("Response error:", resErr)
 		w.WriteHeader(http.StatusNotFound)
-		tmpl.Execute(w, blogData{BlogTitle: GetBlogTitle(), Content: "# 404\n\nWhatever you are looking for, it's not here.", Footer: ""})
+		tmpl.Execute(w, blogData{BlogTitle: GetBlogTitle(), Content: "# 404\n\nWhatever you are looking for, it's not here.", Description: "404 NOT FOUND", Footer: ""})
 		return
 	}
 
@@ -182,7 +187,7 @@ func (BlogHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Read error:", readErr)
 	}
 
-	tmpl.Execute(w, blogData{BlogTitle: GetBlogTitle(), Content: string(content[:]), Footer: os.Getenv("FOOTER")})
+	tmpl.Execute(w, blogData{BlogTitle: GetBlogTitle(), Content: string(content[:]), Description: description, Footer: os.Getenv("FOOTER")})
 }
 
 // main maps paths to handlers and starts the server.
