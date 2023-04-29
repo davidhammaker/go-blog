@@ -44,7 +44,6 @@
         {{ range .Entries }}
         <div class="post">
           <a class="post-title" href="/{{ .Id }}">{{ .Title }}</a
-          ><span style="padding: 0px 15px">-</span
           ><em class="post-date">{{ .Created }}</em>
         </div>
         {{ end }}
@@ -69,8 +68,8 @@
       for (let element of dateElements) {
         const elemDate = new Date(Date.parse(element.innerText));
         const elemMonth = months[elemDate.getMonth()].slice(0, 3);
-        const newDateStr = `${elemMonth}. ${elemDate.getDate()}, ${elemDate.getFullYear()}`;
-        element.innerText = newDateStr;
+        const newDateStr = `${elemMonth}.&nbsp;${elemDate.getDate()}, ${elemDate.getFullYear()}`;
+        element.innerHTML = newDateStr;
       }
     </script>
   </body>

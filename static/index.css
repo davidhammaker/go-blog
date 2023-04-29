@@ -41,6 +41,7 @@ a {
 }
 #title {
   font-size: larger;
+  padding-right: 1em;
 }
 #top {
   width: 100%;
@@ -52,9 +53,13 @@ a {
 }
 .post {
   width: 100%;
+  display: inline-flex;
+  justify-content: space-between;
+  padding-bottom: 1em;
 }
 .post-title {
   font-size: larger;
+  padding-right: 1em;
 }
 .post-date {
   color: #cccccc;
