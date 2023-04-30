@@ -3,3 +3,4 @@ run_blog_app.sh
 caprover.Dockerfile
 builds/
 build_app.sh
+practice/
