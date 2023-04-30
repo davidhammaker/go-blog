@@ -34,6 +34,7 @@ Set the following environment variables:
 | `BLOGTITLE`           | The title of your blog, as it will appear on the top of each page.                                                                                        |
 | `FOOTER`              | Footer text displayed at the bottom of the home page and all blog posts, such as copyright information.                                                   |
 | `HOMEDESCRIPTION`     | Metadata description for the home page.                                                                                                                   |
+| `FILEHOST`            | The web host for video and image files (e.g. `http://example.com/`).                                                                                      |
 
 <br />
 
@@ -50,6 +51,7 @@ docker run -d --name go-blog-app --network go-blog-network -p 8080:8080 \
   -e BLOGTITLE="$BLOGTITLE" \
   -e FOOTER="$FOOTER" \
   -e HOMEDESCRIPTION="$HOMEDESCRIPTION" \
+  -e FILEHOST="$FILEHOST" \
   go-blog-container
 ```
 
