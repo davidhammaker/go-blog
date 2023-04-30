@@ -33,6 +33,7 @@ Set the following environment variables:
 | `HOMEREF`             | The URL reference to a markdown file representing the blog's home page. E.g. `"https://raw.githubusercontent.com/davidhammaker/go-blog/master/README.md"` |
 | `BLOGTITLE`           | The title of your blog, as it will appear on the top of each page.                                                                                        |
 | `FOOTER`              | Footer text displayed at the bottom of the home page and all blog posts, such as copyright information.                                                   |
+| `HOMEDESCRIPTION`     | Metadata description for the home page.                                                                                                                   |
 
 <br />
 
@@ -48,6 +49,7 @@ docker run -d --name go-blog-app --network go-blog-network -p 8080:8080 \
   -e HOMEREF=$HOMEREF \
   -e BLOGTITLE="$BLOGTITLE" \
   -e FOOTER="$FOOTER" \
+  -e HOMEDESCRIPTION="$HOMEDESCRIPTION" \
   go-blog-container
 ```
 
@@ -105,6 +107,7 @@ mysql -p -D mydbname < migrations/upgrade/0000_migration_table.sql
 mysql -p -D mydbname < migrations/upgrade/0001_initial_migration.sql
 ```
 
+- Do this for each subsequent migration.
 - Downgrading is similar.
 
 #### Stop and Restart:
