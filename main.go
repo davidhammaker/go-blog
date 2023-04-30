@@ -47,7 +47,8 @@ func (d *DBHandler) ConnectDB() error {
 // database.
 type Entry struct {
 	id          int
-	ref         string
+	refHost     string
+	refPath     string
 	description string
 }
 
@@ -157,13 +158,13 @@ func (BlogHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if connectErr != nil {
 			fmt.Println("Could not connect:", connectErr)
 		}
-		row := d.db.QueryRow("SELECT id, ref, description FROM entries WHERE id = ?", id)
+		row := d.db.QueryRow("SELECT id, refHost, refPath, description FROM entries WHERE id = ?", id)
 		var ent Entry
-		err := row.Scan(&ent.id, &ent.ref, &ent.description)
+		err := row.Scan(&ent.id, &ent.refHost, &ent.refPath, &ent.description)
 		if err != nil {
 			fmt.Println("Scan failed:", err)
 		}
-		ref = ent.ref
+		ref = ent.refHost + ent.refPath
 		description = ent.description
 	}
 
