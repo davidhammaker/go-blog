@@ -124,7 +124,7 @@ func (EntriesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		entries = append(entries, ent)
 	}
 
-	tmpl := template.Must(template.ParseFiles("static/all_posts.html"))
+	tmpl := template.Must(template.ParseFiles("templates/all_posts.html"))
 	w.Header().Set("content-type", "text/html; charset=UTF-8")
 
 	tmpl.Execute(w, allEntriesData{BlogTitle: GetBlogTitle(), Entries: entries})
@@ -168,7 +168,7 @@ func (BlogHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		description = ent.description
 	}
 
-	tmpl := template.Must(template.ParseFiles("static/index.html"))
+	tmpl := template.Must(template.ParseFiles("templates/index.html"))
 	w.Header().Set("content-type", "text/html; charset=UTF-8")
 
 	res, resErr := http.Get(ref)
