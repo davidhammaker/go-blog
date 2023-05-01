@@ -12,16 +12,10 @@ import (
 	"github.com/go-sql-driver/mysql"
 )
 
-// DBHandler is a struct whose 'db' attribute is a database Handler.
-// The handler can be set with the ConnectDB function.
-type DBHandler struct {
-	db *sql.DB
-}
-
 // ConnectDB connects to a MySQL database, given the following
 // environment variables are set: DBHOST, DBPORT, DBUSER, DBPASS,
 // DBNAME
-func (d *DBHandler) ConnectDB() error {
+func ConnectDB() (*sql.DB, error) {
 	addr := os.Getenv("DBHOST") + ":" + os.Getenv("DBPORT")
 	cfg := mysql.Config{
 		User:                 os.Getenv("DBUSER"),
@@ -33,14 +27,13 @@ func (d *DBHandler) ConnectDB() error {
 	}
 	db, err := sql.Open("mysql", cfg.FormatDSN())
 	if err != nil {
-		return err
+		return nil, err
 	}
 	pingErr := db.Ping()
 	if pingErr != nil {
-		return err
+		return nil, pingErr
 	}
-	d.db = db
-	return nil
+	return db, nil
 }
 
 // Entry stores information from a row in the 'entries' table in the
@@ -104,12 +97,11 @@ type EntriesHandler struct{}
 // EntriesHandler is an http Handler that serves a list of all blog
 // entries with links to their respective pages.
 func (EntriesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	d := DBHandler{}
-	connectErr := d.ConnectDB()
+	db, connectErr := ConnectDB()
 	if connectErr != nil {
 		fmt.Println("Could not connect:", connectErr)
 	}
-	rows, queryErr := d.db.Query("SELECT id, title, created FROM entries ORDER BY created DESC;")
+	rows, queryErr := db.Query("SELECT id, title, created FROM entries ORDER BY created DESC;")
 	if queryErr != nil {
 		fmt.Println("SELECT failed:", queryErr)
 	}
@@ -153,12 +145,11 @@ func (BlogHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		// If an id is provided, attempt to look up the markdown file's URL
 		// ref.
 
-		d := DBHandler{}
-		connectErr := d.ConnectDB()
+		db, connectErr := ConnectDB()
 		if connectErr != nil {
 			fmt.Println("Could not connect:", connectErr)
 		}
-		row := d.db.QueryRow("SELECT id, refHost, refPath, description FROM entries WHERE id = ?", id)
+		row := db.QueryRow("SELECT id, refHost, refPath, description FROM entries WHERE id = ?", id)
 		var ent Entry
 		err := row.Scan(&ent.id, &ent.refHost, &ent.refPath, &ent.description)
 		if err != nil {
