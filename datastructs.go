@@ -4,6 +4,7 @@ package main
 // database.
 type Entry struct {
 	id          int
+	title       string
 	refHost     string
 	refPath     string
 	description string
@@ -13,6 +14,7 @@ type Entry struct {
 // pages.
 type blogData struct {
 	BlogTitle   string
+	PostTitle   string
 	Content     string
 	Description string
 	Footer      string

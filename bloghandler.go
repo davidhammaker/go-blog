@@ -20,12 +20,14 @@ func (BlogHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	var ref string
 	var description string
+	var title string
 
 	if id == "" {
 		// If no id is provided, assume this is the home page and use that
 		// ref.
 		ref = os.Getenv("HOMEREF")
 		description = os.Getenv("HOMEDESCRIPTION")
+		title = ""
 
 	} else {
 		// If an id is provided, attempt to look up the markdown file's URL
@@ -35,14 +37,15 @@ func (BlogHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if connectErr != nil {
 			fmt.Println("Could not connect:", connectErr)
 		}
-		row := db.QueryRow("SELECT id, refHost, refPath, description FROM entries WHERE id = ?", id)
+		row := db.QueryRow("SELECT id, title, refHost, refPath, description FROM entries WHERE id = ?", id)
 		var ent Entry
-		err := row.Scan(&ent.id, &ent.refHost, &ent.refPath, &ent.description)
+		err := row.Scan(&ent.id, &ent.title, &ent.refHost, &ent.refPath, &ent.description)
 		if err != nil {
 			fmt.Println("Scan failed:", err)
 		}
 		ref = ent.refHost + ent.refPath
 		description = ent.description
+		title = ent.title + " | "
 	}
 
 	tmpl := template.Must(template.ParseFiles("templates/index.html"))
@@ -55,7 +58,7 @@ func (BlogHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if resErr != nil {
 		fmt.Println("Response error:", resErr)
 		w.WriteHeader(http.StatusNotFound)
-		tmpl.Execute(w, blogData{BlogTitle: GetBlogTitle(), Content: "# 404\n\nWhatever you are looking for, it's not here.", Description: "404 NOT FOUND", Footer: ""})
+		tmpl.Execute(w, blogData{BlogTitle: GetBlogTitle(), PostTitle: "404 | ", Content: "# 404\n\nWhatever you are looking for, it's not here.", Description: "404 NOT FOUND", Footer: ""})
 		return
 	}
 
@@ -65,5 +68,5 @@ func (BlogHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Read error:", readErr)
 	}
 
-	tmpl.Execute(w, blogData{BlogTitle: GetBlogTitle(), Content: string(content[:]), Description: description, Footer: os.Getenv("FOOTER")})
+	tmpl.Execute(w, blogData{BlogTitle: GetBlogTitle(), PostTitle: title, Content: string(content[:]), Description: description, Footer: os.Getenv("FOOTER")})
 }
