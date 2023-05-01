@@ -36,6 +36,10 @@ a {
   text-decoration: none !important;
   color: #85c5d0 !important;
 }
+img,
+video {
+  max-width: 100%;
+}
 #content {
   background-color: #003040;
 }
