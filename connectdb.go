@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"time"
 	"os"
 
 	"github.com/go-sql-driver/mysql"
@@ -24,6 +25,9 @@ func ConnectDB() (*sql.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+	db.SetConnMaxLifetime(time.Minute * 3)
+	db.SetMaxOpenConns(10)
+	db.SetMaxIdleConns(10)
 	pingErr := db.Ping()
 	if pingErr != nil {
 		return nil, pingErr
